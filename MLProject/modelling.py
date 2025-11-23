@@ -26,9 +26,12 @@ mlflow.set_tracking_uri("https://dagshub.com/d4tu4llam/Workflow-CI.mlflow")
 
 
 mlflow.set_experiment("Submission SML Modelling Diabetes Prediction Hilmi Datu Allam")
+# Cari dataset di folder yang benar
+base_path = os.path.dirname(__file__)
+data_path = os.path.join(base_path, "diabetes_prediction_dataset_preprocessing")
 
-train_data = pd.read_csv("diabetes_prediction_dataset_preprocessing/train_processed.csv")
-test_data = pd.read_csv("diabetes_prediction_dataset_preprocessing/test_processed.csv")
+train_data = pd.read_csv(os.path.join(data_path, "train_processed.csv"))
+test_data = pd.read_csv(os.path.join(data_path, "test_processed.csv"))
 
 # Extract features and target from train data
 X_train = train_data.drop("diabetes", axis=1)
