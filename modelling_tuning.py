@@ -245,7 +245,7 @@ study = optuna.create_study(
     pruner=optuna.pruners.MedianPruner(n_startup_trials=10, n_warmup_steps=5)
 )
 
-with mlflow.start_run(run_name="Optuna_20_Trials_Manual_Nested"):
+with mlflow.start_run(run_name="Optuna_Manual_Nested"):
     mlflow.set_tag("tuning_method", "optuna_manual_nested")
     mlflow.set_tag("objective", "maximize_test_auc")
     mlflow.log_param("total_trials", 20)
