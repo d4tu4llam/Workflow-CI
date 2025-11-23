@@ -161,7 +161,6 @@ def objective(trial):
         - Recall dan Precision untuk konteks medis diabetes.
     
     Metrik yang di-log:
-    Logging artifact dilakukan jika memiliki skor terbaik saat ini.
         - custom_recall_precision_score : nilai objective (0.8R + 0.2P)
         - test_recall, test_precision   : untuk monitoring detail
         - semua metrik standar via log_all_metrics()
@@ -221,17 +220,17 @@ def objective(trial):
         log_metric_info()
         #Log Estimator
         log_estimator_html(model)
-        if score >= best_custom_score:
+        # if score >= best_custom_score:
            
-            #Log visual seperti cm roc auc 
-            log_visual(model, X_test, y_test_pred, y_test_proba)
-            signature = infer_signature(X_test, y_test_pred)
-            mlflow.sklearn.log_model(
-                sk_model=model,
-                artifact_path="model",
-                signature=signature,
-                input_example=input_example
-            )
+        #     #Log visual seperti cm roc auc 
+        #     log_visual(model, X_test, y_test_pred, y_test_proba)
+        #     signature = infer_signature(X_test, y_test_pred)
+        #     mlflow.sklearn.log_model(
+        #         sk_model=model,
+        #         artifact_path="model",
+        #         signature=signature,
+        #         input_example=input_example
+        #     )
         
         mlflow.set_tag("optuna_trial", "true")
        
