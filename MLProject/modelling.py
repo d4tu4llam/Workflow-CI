@@ -15,7 +15,6 @@ from sklearn.metrics import (
 from mlflow.client import MlflowClient
 import random
 import numpy as np
-import dagshub
 from mlflow.models import infer_signature
 
 
