@@ -136,7 +136,7 @@ def log_visual(model, X_test, y_test_pred, y_test_proba):
     mlflow.log_artifact(f"precision_recall_curve.png")
     os.remove(f"precision_recall_curve.png")
 
-
+best_custom_score=0
 
 def objective(trial):
     """
@@ -161,6 +161,7 @@ def objective(trial):
         - Recall dan Precision untuk konteks medis diabetes.
     
     Metrik yang di-log:
+    Logging artifact dilakukan jika memiliki skor terbaik saat ini.
         - custom_recall_precision_score : nilai objective (0.8R + 0.2P)
         - test_recall, test_precision   : untuk monitoring detail
         - semua metrik standar via log_all_metrics()
@@ -213,22 +214,25 @@ def objective(trial):
         # score custom karena kalau mementingkan recall tadi precisionnya drop ke 0.4
         score = 0.8 * recall + 0.2 * precision   
         mlflow.log_metric("custom_recall_precision_score", score)
+        mlflow.log_metric("test_recall", recall)
         #Log all metrics
         log_all_metrics(y_train_pred, y_train_proba, y_test_pred, y_test_proba)
         #Log metric info
         log_metric_info()
         #Log Estimator
         log_estimator_html(model)
-        #Log visual seperti cm roc auc 
-        log_visual(model, X_test, y_test_pred, y_test_proba)
-        signature = infer_signature(X_test, y_test_pred)
-        mlflow.sklearn.log_model(
-            sk_model=model,
-            artifact_path="high_custom_score_candidate",
-            signature=signature,
-            input_example=input_example
-        )
-        mlflow.set_tag("saved", "high_recall")
+        if score >= best_custom_score:
+           
+            #Log visual seperti cm roc auc 
+            log_visual(model, X_test, y_test_pred, y_test_proba)
+            signature = infer_signature(X_test, y_test_pred)
+            mlflow.sklearn.log_model(
+                sk_model=model,
+                artifact_path="model",
+                signature=signature,
+                input_example=input_example
+            )
+        
         mlflow.set_tag("optuna_trial", "true")
        
             
