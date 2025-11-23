@@ -36,12 +36,28 @@ jobs:
       - name: Run mlflow project
         run: |
           mlflow run MLProject --env-manager=local 
+          - name: Run MLflow Project
+          run: |
+            mlflow run MLProject --no-conda   # PAKAI --no-conda BIAR GAK ERROR CONDA
+  
+      - name: Debug Show where mlruns & mlartifacts created
+        run: |
+          echo "=== CURRENT DIR ==="
+          pwd
+          echo "=== ROOT FILES ==="
+          ls -la
+          echo "=== mlruns location ==="
+          find . -name "mlruns" -type d || echo "mlruns not found"
+          echo "=== mlartifacts location ==="
+          find . -name "mlartifacts" -type d || echo "mlartifacts not found"
+
       # Get latest run_id
       - name: Get latest MLflow run_id
         run: |
           RUN_ID=$(ls -td mlruns/0/*/ | head -n 1 | cut -d'/' -f3)
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
           echo "Latest run_id: $RUN_ID"
+
       #Upload ke github
       - name: Upload Artifacts to GitHub
         uses: actions/upload-artifact@v4
@@ -55,8 +71,8 @@ jobs:
       - name: Build Docker Model
         run: |
           mlflow models build-docker \
-          --model-uri runs:/${{ env.RUN_ID }}/model \ 
-          --name "cc" 
+            --model-uri runs:/${{ env.RUN_ID }}/model \
+            --name ${{ secrets.DOCKERHUB_USERNAME }}/hilmi-diabetes-model:latest
 
       # Login to Docker Hub
       - name: Log in to Docker Hub
