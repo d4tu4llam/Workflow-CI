@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+import sys
 import json
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
@@ -17,31 +18,6 @@ import numpy as np
 import dagshub
 from mlflow.models import infer_signature
 
-#tracking UI
-#Buat Lokal
-#mlflow.set_tracking_uri("http://127.0.0.1:5000/")
-#Buat dagshub
-dagshub.init(repo_owner='d4tu4llam', repo_name='Workflow-CI', mlflow=True)
-mlflow.set_tracking_uri("https://dagshub.com/d4tu4llam/Workflow-CI.mlflow")
-
-
-mlflow.set_experiment("Submission SML Modelling Diabetes Prediction Hilmi Datu Allam")
-# Cari dataset di folder yang benar
-base_path = os.path.dirname(__file__)
-data_path = os.path.join(base_path, "diabetes_prediction_dataset_preprocessing")
-
-train_data = pd.read_csv(os.path.join(data_path, "train_processed.csv"))
-test_data = pd.read_csv(os.path.join(data_path, "test_processed.csv"))
-
-# Extract features and target from train data
-X_train = train_data.drop("diabetes", axis=1)
-y_train = train_data["diabetes"]
-
-# Extract features from test data
-X_test = test_data.drop("diabetes", axis=1)
-y_test = test_data["diabetes"]
-
-input_example = X_train.iloc[0:5].values
 
 def log_all_metrics(y_train_pred, y_train_proba, y_test_pred ,y_test_proba ):
     # Log all metrics
@@ -142,47 +118,75 @@ def log_visual(model, X_test, y_test_pred, y_test_proba):
     mlflow.log_artifact(f"precision_recall_curve.png")
     os.remove(f"precision_recall_curve.png")
 
-with mlflow.start_run():
-    #Log parameters
-    params = {
-        "n_estimators": 200,
-        "max_depth": 10,
-        "min_samples_split": 2,
-        "min_samples_leaf": 1,
-        "max_features": "sqrt",
-        "random_state": 42,
-        "n_jobs": -1,
-        "bootstrap": True,
-        "class_weight": None,
-        "criterion": "gini"
-    }
-    mlflow.log_params(params)
+if __name__ == "__main__":
+    # BISA PAKAI ARGUMEN ATAU DEFAULT (PERSIS KAYAK MENTOR!)
+    n_estimators = int(sys.argv[1]) if len(sys.argv) > 1 else 200
+    max_depth = int(sys.argv[2]) if len(sys.argv) > 2 else 10
+    min_samples_split = int(sys.argv[3]) if len(sys.argv) > 3 else 2
 
-    #Train model
-    model = RandomForestClassifier(**params)
-    model.fit(X_train, y_train)
+    # Path dataset otomatis
+    base_path = os.path.dirname(__file__)
+    data_folder = os.path.join(base_path, "diabetes_prediction_dataset_preprocessing")
     
-    #Training Metrics
-    y_train_pred = model.predict(X_train)
-    y_train_proba = model.predict_proba(X_train)[:, 1]
-    #Test metrics
-    y_test_pred = model.predict(X_test)
-    y_test_proba = model.predict_proba(X_test)[:, 1]
-    #Log all metrics
-    log_all_metrics(y_train_pred, y_train_proba, y_test_pred, y_test_proba)
-    #Log metric info
-    log_metric_info()
-    #Log Estimator
-    log_estimator_html(model)
-    #Log visual seperti cm roc auc 
-    log_visual(model, X_test, y_test_pred, y_test_proba)
+    train_path = os.path.join(data_folder, "train_processed.csv")
+    test_path = os.path.join(data_folder, "test_processed.csv")
 
-    
-    signature = infer_signature(X_test, y_test_pred)
+    train_data = pd.read_csv(train_path)
+    test_data = pd.read_csv(test_path)
 
-    mlflow.sklearn.log_model(
-        sk_model=model,
-        artifact_path="model",
-        signature=signature,
-        input_example=input_example
-    )
+    # Extract features and target from train data
+    X_train = train_data.drop("diabetes", axis=1)
+    y_train = train_data["diabetes"]
+
+    # Extract features from test data
+    X_test = test_data.drop("diabetes", axis=1)
+    y_test = test_data["diabetes"]
+
+    input_example = X_train.iloc[0:5].values
+
+
+    with mlflow.start_run():
+        #Log parameters
+        params = {
+            "n_estimators": n_estimators,
+            "max_depth": max_depth,
+            "min_samples_split": min_samples_split,
+            "min_samples_leaf": 1,
+            "max_features": "sqrt",
+            "random_state": 42,
+            "n_jobs": -1,
+            "bootstrap": True,
+            "class_weight": None,
+            "criterion": "gini"
+        }
+        mlflow.log_params(params)
+
+        #Train model
+        model = RandomForestClassifier(**params)
+        model.fit(X_train, y_train)
+        
+        #Training Metrics
+        y_train_pred = model.predict(X_train)
+        y_train_proba = model.predict_proba(X_train)[:, 1]
+        #Test metrics
+        y_test_pred = model.predict(X_test)
+        y_test_proba = model.predict_proba(X_test)[:, 1]
+        #Log all metrics
+        log_all_metrics(y_train_pred, y_train_proba, y_test_pred, y_test_proba)
+        #Log metric info
+        log_metric_info()
+        #Log Estimator
+        log_estimator_html(model)
+        #Log visual seperti cm roc auc 
+        log_visual(model, X_test, y_test_pred, y_test_proba)
+
+        
+        signature = infer_signature(X_test, y_test_pred)
+
+        mlflow.sklearn.log_model(
+            sk_model=model,
+            artifact_path="model",
+            signature=signature,
+            input_example=input_example,
+            registered_model_name="Diabetes_RFC_Hilmi_Manual"
+        )

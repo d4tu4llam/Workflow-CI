@@ -1,0 +1,13 @@
+# MLProject/MLproject
+name: diabetes-prediction-hilmi
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      n_estimators: {type: int, default: 800}
+      max_depth: {type: int, default: 30}
+      min_samples_split: {type: int, default: 2}
+    command: >
+      python modelling.py {n_estimators} {max_depth} {min_samples_split}
