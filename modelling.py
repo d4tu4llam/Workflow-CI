@@ -19,10 +19,10 @@ from mlflow.models import infer_signature
 
 #tracking UI
 #Buat Lokal
-mlflow.set_tracking_uri("http://127.0.0.1:5000/")
+#mlflow.set_tracking_uri("http://127.0.0.1:5000/")
 #Buat dagshub
-#dagshub.init(repo_owner='d4tu4llam', repo_name='Workflow-CI', mlflow=True)
-#mlflow.set_tracking_uri("https://dagshub.com/d4tu4llam/Workflow-CI.mlflow")
+dagshub.init(repo_owner='d4tu4llam', repo_name='Workflow-CI', mlflow=True)
+mlflow.set_tracking_uri("https://dagshub.com/d4tu4llam/Workflow-CI.mlflow")
 
 
 mlflow.set_experiment("Submission SML Modelling Diabetes Prediction Hilmi Datu Allam")
