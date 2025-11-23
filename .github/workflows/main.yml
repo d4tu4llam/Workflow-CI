@@ -29,8 +29,8 @@ jobs:
         run: |
           echo $CSV_URL
       #Install mlflow
-      - name: Install MLflow
-        run: pip install mlflow==2.19.0
+      - name: Install dependencies
+        run: pip install mlflow==2.18.0 scikit-learn pandas optuna matplotlib seaborn
 
       # Run as a mlflow project
       - name: Run mlflow project
