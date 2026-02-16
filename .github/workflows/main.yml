@@ -9,7 +9,7 @@ permissions:
     contents: write
     
 env:
-  CSV_URL: "MLproject/train_processed.csv"
+  CSV_URL: "MLProject/diabetes_prediction_dataset_preprocessing/train_processed.csv"
   
     
 jobs:
