@@ -35,7 +35,7 @@ jobs:
       # Run as a mlflow project
       - name: Run mlflow project
         run: |
-          mlflow run MLProject --env-manager=local 
+          mlflow run MLProject 
   
       - name: Debug nunjukkin dimana mlruns dan mlartifact
         run: |
